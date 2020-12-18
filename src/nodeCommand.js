@@ -215,6 +215,7 @@ export async function getNodeStatus(){
     console.log(md5_status)
     if (!md5_status){
         console.log("file md5 is wrong, deleting")
+        if (global.downloading) return { status : 500, PID: -6 , msg:"stacks-node is downloading"}
         let deleteResult = await deleteStacksNode()
         if (deleteResult){
             return { status : 500, PID: -3 , msg:"Found stacks-node, but stacks-node is incomplete. Will delete it, delete successfully."}

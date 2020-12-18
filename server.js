@@ -5,6 +5,7 @@ import { download } from './src/downloadBinary.js'
 
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { checkStacksNodeExists} from "./utils/stacksNode.js"
 
 const app = express()
 const clientApp = express()
@@ -16,7 +17,6 @@ const io = new Server(httpServer, {})
 import os from "os"
 import fs from "fs"
 import request from "request"
-import {checkStacksNodeExists} from './utils/stacksNode.js'
 
 function selectSystem(){
     console.log(os.platform())
@@ -52,8 +52,9 @@ io.on('connection', (socket) => {
         let percent = 0;
         let lastPercent = 0;
         req.pipe(out);
-
+        
         req.on('data', function (chunk) {
+            global.downloading = true;
             cur += chunk.length
             if (total != 0){
                 percent = cur/total
@@ -68,6 +69,7 @@ io.on('connection', (socket) => {
         });
 
         req.on('end', function() {
+            global.downloading = false;
             //console.log("say something")
             io.emit("download_info", lastPercent)
             io.emit("download_complete", 1)
@@ -143,7 +145,7 @@ app.get('/download', async (req, res)=>{
 httpServer.listen(port, () => {
     console.log(`Local Server listening at http://localhost:${port}`)
 })
-
+/*
 clientApp.listen(8000, () => {
     console.log(`Mining-Bot Client listening at http://localhost:8000`)
 })
@@ -152,3 +154,4 @@ clientApp.use(express.static('dist'));
 clientApp.get('/*', function (req, res) {
   res.sendFile('dist/index.html', { root: '.' });
 });
+*/
