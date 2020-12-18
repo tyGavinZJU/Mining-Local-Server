@@ -143,14 +143,31 @@ app.get('/download', async (req, res)=>{
 })
 
 httpServer.listen(port, () => {
-    console.log(`Local Server listening at http://localhost:${port}`)
+    console.log(`Local Server listening at http://${getLocalIP()}:${port}`)
 })
 
 clientApp.listen(8000, () => {
-    console.log(`Mining-Bot Client listening at http://localhost:8000`)
+    console.log(`Mining-Bot Client listening at http://${getLocalIP()}:8000`)
 })
 clientApp.use(express.static('dist'));
 
 clientApp.get('/*', function (req, res) {
   res.sendFile('dist/index.html', { root: '.' });
 });
+
+const interfaces = os.networkInterfaces();
+
+function getLocalIP(){
+    let IPAddress = '';
+    for(var devName in interfaces){
+        var iface = interfaces[devName];
+        for(var i=0;i<iface.length;i++){
+            var alias = iface[i];
+
+            if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && alias.address !== '0.0.0.0' && !alias.internal){
+                IPAddress = alias.address;
+            }
+        }   
+    }
+    return IPAddress;
+};
